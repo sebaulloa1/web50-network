@@ -1,0 +1,61 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <div class="post-container">
+        <h3>New Post</h3>
+        <form id="new-post-form">
+            <textarea id="new-post-content"></textarea>
+            <input style="float:right;margin-right: 5%;" type="submit" class="btn" value="Post">
+        </form>
+    </div>
+
+    <div id="posts-view">
+        {% for post in posts %}
+            <div class="post-container" id="post_{{ post.id }}">
+                <div class="post-container-username">
+                    <a href="{% url 'user' post.post_user.id %}"><b>{{ post.post_user.username }}</b></a>
+                    <div class="post-timestamp">{{ post.post_timestamp|date:"M j Y, g:i A" }}</div>
+                </div>
+                <div class="post-content">{{ post.post_content }}</div>
+                
+                
+                <div id="like-btn" class="likes-container" data-id="{{ post.id }}">
+                    <span class="like-btn" aria-label="Like this post." data-id="{{ post.id }}">
+                        <svg data-id="{{ post.id }}" {% if post.liked_by_user %}class="heart liked" {% else %}class="heart"{% endif %} viewBox="0 0 32 29.6">
+                            <path data-id="{{ post.id }}" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+                            c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+                        </svg>
+                    </span>
+                    <label data-id="{{ post.id }}" for="likes-container" id="post-likes">{{ post.post_likes }}</label>
+                </div>
+                {% if post.editable %}
+                <button data-id="{{ post.id }}" id="edit-btn" class="btn">Edit</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    
+    {% if posts.has_other_pages %}
+    <ul class="pagination">
+    {% if posts.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+        <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+        {% if posts.number == i %}
+        <li class="active page-item"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li class="page-item"><a class="page-link page-number" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+        <li><a class="page-link" href="?page={{ posts.next_page_number }}">&raquo;</a></li>
+    {% else %}
+        <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+    </ul>
+    {% endif %}
+
+{% endblock %}
